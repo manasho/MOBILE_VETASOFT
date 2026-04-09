@@ -47,7 +47,7 @@ class _VerRegistroViewState extends State<VerRegistroView> {
                     child: Column(
                       children: [
                         _campo('Fecha de consulta',
-                            _formatearFecha(widget.historial.fechaCreacion)),
+                            _formatearFecha(widget.historial.fechaCreacion ?? widget.historial.fechaConsulta)),
                         _campo('Diagnóstico', widget.historial.diagnostico),
                          _campo('Síntomas', widget.historial.sintomas),
                         _campo('Tratamiento', widget.historial.tratamiento),

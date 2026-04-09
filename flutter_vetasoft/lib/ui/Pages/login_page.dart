@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
+import '../../services/service_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

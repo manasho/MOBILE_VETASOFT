@@ -246,7 +246,7 @@ Widget _btnAgregar() {
 
                     // Fecha
                     Text(
-                      _formatearFecha(item.fechaCreacion),
+                      _formatearFecha(item.fechaCreacion ?? item.fechaConsulta),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -256,10 +256,10 @@ Widget _btnAgregar() {
                     const SizedBox(height: 12),
 
                     _campo('Observaciones',
-                        item.observaciones.isNotEmpty ? item.observaciones : 'N/A'),
+                        (item.observaciones ?? "").isNotEmpty ? item.observaciones! : 'N/A'),
 
                     _campo('Diagnostico',
-                        item.diagnostico.isNotEmpty ? item.diagnostico : 'No especificado'),
+                        (item.diagnostico ?? "").isNotEmpty ? item.diagnostico! : 'No especificado'),
 
                     _campo('Próximo control',
                         _formatearFechaNullable(item.proximaCita)),

@@ -23,21 +23,24 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _cargandoTipos = true;
-  
+
   List<Map<String, dynamic>> _tiposConsulta = [];
   int? _tipoConsultaId;
-  
+
   DateTime? _fechaConsulta;
   final TextEditingController _diagnosticoController = TextEditingController();
   final TextEditingController _sintomasController = TextEditingController();
   final TextEditingController _tratamientoController = TextEditingController();
   final TextEditingController _medicamentosController = TextEditingController();
   final TextEditingController _examenesController = TextEditingController();
-  final TextEditingController _observacionesController = TextEditingController();
+  final TextEditingController _observacionesController =
+      TextEditingController();
   final TextEditingController _pesoController = TextEditingController();
   final TextEditingController _temperaturaController = TextEditingController();
-  final TextEditingController _frecuenciaCardiacaController = TextEditingController();
-  final TextEditingController _frecuenciaRespiratoriaController = TextEditingController();
+  final TextEditingController _frecuenciaCardiacaController =
+      TextEditingController();
+  final TextEditingController _frecuenciaRespiratoriaController =
+      TextEditingController();
   DateTime? _proximaCita;
 
   List<Map<String, dynamic>> _citasActivas = [];
@@ -54,14 +57,14 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
   Future<void> _cargarCitasActivas() async {
     setState(() => _cargandoCitas = true);
     try {
-      final citas = await ApiServiceCitas.obtenerCitasPorAnimalYEstado(widget.animalId, 3);
+      final citas = await ApiServiceCitas.obtenerCitasPorAnimalYEstado(
+        widget.animalId,
+        3,
+      );
       setState(() {
-        _citasActivas = citas.map((c) {
-          return {
-            ...c,
-            'cita_id': int.tryParse(c['cita_id'].toString()) ?? 0,
-          };
-        }).toList();
+        _citasActivas = List<Map<String, dynamic>>.from(citas.map((c) {
+          return {...c, 'cita_id': int.tryParse(c['cita_id'].toString()) ?? 0};
+        }));
         _cargandoCitas = false;
         if (_citasActivas.length == 1) {
           _citaId = _citasActivas[0]['cita_id'];
@@ -78,13 +81,15 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
     try {
       final tipos = await ApiServiceHistorial.obtenerTiposConsulta();
       setState(() {
-        _tiposConsulta = tipos.map((t) {
+        _tiposConsulta = List<Map<String, dynamic>>.from(tipos.map((t) {
           return {
             ...t,
-            'id': int.tryParse((t['tipo_consulta_id'] ?? t['id']).toString()) ?? 0,
+            'id':
+                int.tryParse((t['tipo_consulta_id'] ?? t['id']).toString()) ??
+                0,
             'nombre': t['nombre'] ?? t['nombre_consulta'] ?? 'Sin nombre',
           };
-        }).toList();
+        }));
         _cargandoTipos = false;
       });
     } catch (e) {
@@ -122,8 +127,9 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
         "cita_id": _citaId,
         "veterinario_id": veterinarioIdValue ?? 2,
         "tipo_consulta_id": _tipoConsultaId,
-        "fecha_consulta": _fechaConsulta?.toIso8601String().split('T').first ?? 
-                         DateTime.now().toIso8601String().split('T').first,
+        "fecha_consulta":
+            _fechaConsulta?.toIso8601String().split('T').first ??
+            DateTime.now().toIso8601String().split('T').first,
         "sintomas": _sintomasController.text,
         "diagnostico": _diagnosticoController.text,
         "tratamiento": _tratamientoController.text,
@@ -133,8 +139,10 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
         "observaciones": _observacionesController.text,
         "peso": double.tryParse(_pesoController.text) ?? 0,
         "temperatura": double.tryParse(_temperaturaController.text) ?? 0,
-        "frecuencia_cardiaca": int.tryParse(_frecuenciaCardiacaController.text) ?? 0,
-        "frecuencia_respiratoria": int.tryParse(_frecuenciaRespiratoriaController.text) ?? 0,
+        "frecuencia_cardiaca":
+            int.tryParse(_frecuenciaCardiacaController.text) ?? 0,
+        "frecuencia_respiratoria":
+            int.tryParse(_frecuenciaRespiratoriaController.text) ?? 0,
       };
 
       print('📤 Enviando datos mediante servicio: $data');
@@ -150,16 +158,18 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registro guardado y cita finalizada exitosamente')),
+            const SnackBar(
+              content: Text('Registro guardado y cita finalizada exitosamente'),
+            ),
           );
           Navigator.pop(context, true);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -288,10 +298,7 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
             ),
             child: const Text(
               'Información básica',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
@@ -302,19 +309,44 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
                 const SizedBox(height: 12),
                 _dropdownTipoConsulta(),
                 const SizedBox(height: 12),
-                _fechaCampo('Fecha de consulta', _fechaConsulta, () => _seleccionarFecha(context, false)),
+                _fechaCampo(
+                  'Fecha de consulta',
+                  _fechaConsulta,
+                  () => _seleccionarFecha(context, false),
+                ),
                 const SizedBox(height: 12),
-                _textCampo('Diagnóstico', _diagnosticoController, 'Ej: diagnóstico', required: true),
+                _textCampo(
+                  'Diagnóstico',
+                  _diagnosticoController,
+                  'Ej: diagnóstico',
+                  required: true,
+                ),
                 const SizedBox(height: 12),
                 _textCampo('Síntomas', _sintomasController, 'Ej: síntomas'),
                 const SizedBox(height: 12),
-                _textCampo('Tratamiento', _tratamientoController, 'Ej: tratamiento'),
+                _textCampo(
+                  'Tratamiento',
+                  _tratamientoController,
+                  'Ej: tratamiento',
+                ),
                 const SizedBox(height: 12),
-                _textCampo('Medicamentos', _medicamentosController, 'Ej: medicamento'),
+                _textCampo(
+                  'Medicamentos',
+                  _medicamentosController,
+                  'Ej: medicamento',
+                ),
                 const SizedBox(height: 12),
-                _textCampo('Exámenes realizados', _examenesController, 'Ej: examenes realizados'),
+                _textCampo(
+                  'Exámenes realizados',
+                  _examenesController,
+                  'Ej: examenes realizados',
+                ),
                 const SizedBox(height: 12),
-                _textCampo('Observaciones', _observacionesController, 'Ej: observaciones'),
+                _textCampo(
+                  'Observaciones',
+                  _observacionesController,
+                  'Ej: observaciones',
+                ),
               ],
             ),
           ),
@@ -345,7 +377,13 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
           child: _cargandoCitas
               ? const Padding(
                   padding: EdgeInsets.all(12),
-                  child: Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+                  child: Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 )
               : DropdownButtonFormField<int>(
                   value: _citaId,
@@ -354,11 +392,14 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
                   items: _citasActivas.map((cita) {
                     return DropdownMenuItem<int>(
                       value: cita['cita_id'],
-                      child: Text('Cita #${cita['cita_id']} - ${cita['fecha_cita']}'),
+                      child: Text(
+                        'Cita #${cita['cita_id']} - ${cita['fecha_cita']}',
+                      ),
                     );
                   }).toList(),
                   onChanged: (value) => setState(() => _citaId = value),
-                  validator: (value) => value == null ? 'Selecciona una cita' : null,
+                  validator: (value) =>
+                      value == null ? 'Selecciona una cita' : null,
                   decoration: const InputDecoration(border: InputBorder.none),
                 ),
         ),
@@ -388,7 +429,13 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
           child: _cargandoTipos
               ? const Padding(
                   padding: EdgeInsets.all(12),
-                  child: Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+                  child: Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 )
               : DropdownButtonFormField<int>(
                   value: _tipoConsultaId,
@@ -401,7 +448,8 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
                   }).toList(),
                   onChanged: (value) => setState(() => _tipoConsultaId = value),
                   decoration: const InputDecoration(border: InputBorder.none),
-                  validator: (value) => value == null ? 'Selecciona un tipo de consulta' : null,
+                  validator: (value) =>
+                      value == null ? 'Selecciona un tipo de consulta' : null,
                 ),
         ),
       ],
@@ -435,10 +483,7 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
             ),
             child: const Text(
               'Datos vitales',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
@@ -447,21 +492,49 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _textCampoNumerico('Peso (kg)', _pesoController, 'Ej: 15')),
+                    Expanded(
+                      child: _textCampoNumerico(
+                        'Peso (kg)',
+                        _pesoController,
+                        'Ej: 15',
+                      ),
+                    ),
                     const SizedBox(width: 16),
-                    Expanded(child: _textCampoNumerico('Temperatura (°C)', _temperaturaController, 'Ej: 38.5')),
+                    Expanded(
+                      child: _textCampoNumerico(
+                        'Temperatura (°C)',
+                        _temperaturaController,
+                        'Ej: 38.5',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _textCampoNumerico('Frecuencia cardíaca', _frecuenciaCardiacaController, 'Ej: 92')),
+                    Expanded(
+                      child: _textCampoNumerico(
+                        'Frecuencia cardíaca',
+                        _frecuenciaCardiacaController,
+                        'Ej: 92',
+                      ),
+                    ),
                     const SizedBox(width: 16),
-                    Expanded(child: _textCampoNumerico('Frecuencia respiratoria', _frecuenciaRespiratoriaController, 'Ej: 24')),
+                    Expanded(
+                      child: _textCampoNumerico(
+                        'Frecuencia respiratoria',
+                        _frecuenciaRespiratoriaController,
+                        'Ej: 24',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                _fechaCampo('Próxima consulta', _proximaCita, () => _seleccionarFecha(context, true)),
+                _fechaCampo(
+                  'Próxima consulta',
+                  _proximaCita,
+                  () => _seleccionarFecha(context, true),
+                ),
               ],
             ),
           ),
@@ -470,11 +543,23 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
     );
   }
 
-  Widget _textCampo(String label, TextEditingController controller, String hint, {bool required = false}) {
+  Widget _textCampo(
+    String label,
+    TextEditingController controller,
+    String hint, {
+    bool required = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 4),
         TextFormField(
           controller: controller,
@@ -482,11 +567,18 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
             hintText: hint,
             filled: true,
             fillColor: Colors.grey[100],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
           ),
           validator: (value) {
-            if (required && (value == null || value.isEmpty)) return 'Este campo es requerido';
+            if (required && (value == null || value.isEmpty))
+              return 'Este campo es requerido';
             return null;
           },
         ),
@@ -494,11 +586,22 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
     );
   }
 
-  Widget _textCampoNumerico(String label, TextEditingController controller, String hint) {
+  Widget _textCampoNumerico(
+    String label,
+    TextEditingController controller,
+    String hint,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 4),
         TextFormField(
           controller: controller,
@@ -507,8 +610,14 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
             hintText: hint,
             filled: true,
             fillColor: Colors.grey[100],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
           ),
         ),
       ],
@@ -519,17 +628,31 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 4),
         GestureDetector(
           onTap: onTap,
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Text(
-              fecha != null ? '${fecha.day}/${fecha.month}/${fecha.year}' : 'DD/MM/AAAA',
-              style: TextStyle(color: fecha != null ? Colors.black87 : Colors.grey[500]),
+              fecha != null
+                  ? '${fecha.day}/${fecha.month}/${fecha.year}'
+                  : 'DD/MM/AAAA',
+              style: TextStyle(
+                color: fecha != null ? Colors.black87 : Colors.grey[500],
+              ),
             ),
           ),
         ),
@@ -542,7 +665,13 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, -2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -553,7 +682,9 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
                 backgroundColor: const Color(0xFF664492),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text('Guardar'),
             ),
@@ -566,7 +697,9 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
                 foregroundColor: Colors.grey[700],
                 side: BorderSide(color: Colors.grey[300]!),
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text('Cancelar'),
             ),

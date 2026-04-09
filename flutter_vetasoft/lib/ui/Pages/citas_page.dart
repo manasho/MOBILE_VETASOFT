@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/citas_service.dart';
+import '../../services/service_citas.dart';
 
 class AgendaPage extends StatefulWidget {
   final String token;
@@ -29,8 +29,7 @@ class _AgendaPageState extends State<AgendaPage> {
   }
 
   Future<void> loadCitas() async {
-    final data = await CitasService.getCitas(
-      token: widget.token,
+    final data = await ApiServiceCitas.getCitas(
       clienteId: widget.clienteId,
     );
 

@@ -1,10 +1,10 @@
 import 'api_service.dart';
 
-class CitasService {
-  final ApiService _api = ApiService();
+class ApiServiceCitas {
+  static final ApiService _api = ApiService();
 
   /// 🔍 Obtener citas por cliente
-  Future<List<dynamic>> getCitas({
+  static Future<List<dynamic>> getCitas({
     int? clienteId,
   }) async {
     try {
@@ -13,7 +13,7 @@ class CitasService {
       });
       return response.data['data'] ?? [];
     } catch (e) {
-      print('❌ Error en CitasService.getCitas: $e');
+      print('❌ Error en ApiServiceCitas.getCitas: $e');
       return [];
     }
   }
@@ -21,24 +21,22 @@ class CitasService {
   /// 🐾 Obtener citas por animal y estado
   static Future<List<dynamic>> obtenerCitasPorAnimalYEstado(int animalId, int estadoId) async {
     try {
-      final api = ApiService();
-      final response = await api.get('/citas/animal/$animalId/estado/$estadoId');
+      final response = await _api.get('/citas/animal/$animalId/estado/$estadoId');
       return response.data['data'] ?? [];
     } catch (e) {
-      print('❌ Error en CitasService.obtenerCitasPorAnimalYEstado: $e');
+      print('❌ Error en ApiServiceCitas.obtenerCitasPorAnimalYEstado: $e');
       return [];
     }
   }
 
-  /// ✅ Actualizar el estado de una cita (ej: pasar a finalizada)
+  /// ✅ Actualizar el estado de una cita
   static Future<void> actualizarEstadoCita(int citaId, int nuevoEstadoId) async {
     try {
-      final api = ApiService();
-      await api.patch('/citas/$citaId/estado', data: {
+      await _api.patch('/citas/$citaId/estado', data: {
         "estado_id": nuevoEstadoId,
       });
     } catch (e) {
-      print('❌ Error en CitasService.actualizarEstadoCita: $e');
+      print('❌ Error en ApiServiceCitas.actualizarEstadoCita: $e');
     }
   }
 }

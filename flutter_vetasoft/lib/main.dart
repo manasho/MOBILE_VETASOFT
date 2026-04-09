@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       // Mantenemos RegisterClientView como inicio para tus pruebas de registro
       // Si quieres probar el Login de Jose, cambia esto a: const LoginPage()
-      home: const RegisterClientView(), 
+      home: const LoginPage(), 
     );
   }
 }
