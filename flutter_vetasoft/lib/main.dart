@@ -4,6 +4,7 @@ import 'package:flutter_vetasoft/ui/pages/adoptionview/solicitudes_list_page.dar
 import 'package:flutter_vetasoft/ui/pages/profileview/Profile_cofig_page.dart';
 import 'package:flutter_vetasoft/ui/pages/veterianrioview/veterinarian_panel_page.dart';
 import 'package:flutter_vetasoft/ui/pages/adoptionview/solicitud_form_page.dart';
+import 'package:flutter_vetasoft/ui/pages/pettview/register_client_view.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // 🚀 ¡Aquí está el truco! Ponemos tu panel como la página inicial
-      home: const SolicitudFormPage(animalId: 4, animalNombre: 'copito lindo'), 
+      home: const RegisterClientView(), 
     );
   }
 }
