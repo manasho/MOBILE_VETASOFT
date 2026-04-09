@@ -3,7 +3,7 @@ import '../../services/service_historial_medico.dart';
 import '../../services/service_auth.dart';
 import '../../services/service_citas.dart';
 import '../../services/api_service.dart';
-import '../../models/historial_medico_model.dart';
+
 
 class AgregarRegistroView extends StatefulWidget {
   final String nombreMascota;
@@ -216,45 +216,46 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
   }
 
   Widget _header() {
-    return Container(
+     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 16,
-        16,
-        16,
+        12,
+        MediaQuery.of(context).padding.top + 8,
+        12,
+        12,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF5D9CC5), Color(0xFF664492)],
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Agregar registro',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'De ${widget.nombreMascota}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
+                Icon(Icons.arrow_back, color: Colors.white, size: 13),
+                SizedBox(width: 8),
+                Text('Volver', style: TextStyle(color: Colors.white)),
               ],
             ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Agregar registro',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            widget.nombreMascota,
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
           ),
         ],
       ),
@@ -544,35 +545,68 @@ class _AgregarRegistroViewState extends State<AgregarRegistroView> {
         color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, -2))],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _guardarRegistro,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF664492),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+     child: Row(
+  children: [
+    Expanded(
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _guardarRegistro,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          elevation: 0,  // ← Elimina la elevación/sombra
+          shadowColor: Colors.transparent,  // ← Elimina la sombra
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF5D9CC5), Color(0xFF664492)],
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Center(
+            child: Text(
+              'Guardar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
               ),
-              child: const Text('Guardar'),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.grey[700],
-                side: BorderSide(color: Colors.grey[300]!),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('Cancelar'),
-            ),
-          ),
-        ],
+        ),
       ),
+    ),
+    const SizedBox(width: 12),
+    Expanded(
+      child: OutlinedButton(
+        onPressed: () => Navigator.pop(context),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.red,
+          elevation: 0,  // ← Elimina la sombra
+          shadowColor: Colors.transparent,  // ← Elimina la sombra
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          side: const BorderSide(color: Colors.red),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Text(
+          'Cancelar',
+          style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ),
+  ],
+),
     );
   }
 }

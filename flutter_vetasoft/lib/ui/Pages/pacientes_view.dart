@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vetasoft/models/pacientes_model.dart';
 import 'package:flutter_vetasoft/services/service_paciente.dart';
-import 'historial_medico_view.dart'; // Importa la vista de historial
-// INICIO - IMPORTAR LA VISTA DE GESTIÓN DE CITAS (ELIMINAR DESPUÉS)
-
-// FIN - IMPORTAR LA VISTA DE GESTIÓN DE CITAS
+import 'historial_medico_view.dart'; 
 
 class PacientesView extends StatefulWidget {
   const PacientesView({super.key});
@@ -121,7 +118,12 @@ class _PacientesViewState extends State<PacientesView> {
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: EdgeInsets.fromLTRB(
+        12,
+        MediaQuery.of(context).padding.top + 8,
+        12,
+        12,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [

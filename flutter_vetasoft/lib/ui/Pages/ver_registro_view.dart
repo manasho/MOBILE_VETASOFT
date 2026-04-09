@@ -102,10 +102,10 @@ class _VerRegistroViewState extends State<VerRegistroView> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 14,
-        16,
-        16,
+        12,
+        MediaQuery.of(context).padding.top + 8,
+        12,
+        12,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -119,7 +119,7 @@ class _VerRegistroViewState extends State<VerRegistroView> {
             onTap: () => Navigator.pop(context),
             child: const Row(
               children: [
-                Icon(Icons.arrow_back, color: Colors.white),
+                Icon(Icons.arrow_back, color: Colors.white, size: 18),
                 SizedBox(width: 8),
                 Text('Volver', style: TextStyle(color: Colors.white)),
               ],
