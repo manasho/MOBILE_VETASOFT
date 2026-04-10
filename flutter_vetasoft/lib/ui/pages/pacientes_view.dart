@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vetasoft/models/pacientes_model.dart';
-import 'package:flutter_vetasoft/services/service_paciente.dart';
+import 'package:flutter_vetasoft/services/animal_service.dart';
 import 'historial_medico_view.dart'; // Importa la vista de historial
-// INICIO - IMPORTAR LA VISTA DE GESTIÓN DE CITAS (ELIMINAR DESPUÉS)
-
-// FIN - IMPORTAR LA VISTA DE GESTIÓN DE CITAS
+import 'citas_page.dart';
+import '../../services/auth_service.dart';
 
 class PacientesView extends StatefulWidget {
   const PacientesView({super.key});
@@ -44,8 +43,8 @@ class _PacientesViewState extends State<PacientesView> {
     });
 
     try {
-      final pacientesData = await ApiServicePaciente.obtenerPacientes();
-      final especiesData = await ApiServicePaciente.obtenerEspecies();
+      final pacientesData = await AnimalService.getAnimales();
+      final especiesData = await AnimalService.getEspecies();
 
       setState(() {
         pacientes = pacientesData;
@@ -90,7 +89,7 @@ class _PacientesViewState extends State<PacientesView> {
   List<String> _obtenerEspeciesUnicas() {
     final especiesSet = <String>{'Todas'};
     for (var p in pacientes) {
-      if (p.nombreEspecie != null) {
+      if (p.nombreEspecie.isNotEmpty) {
         especiesSet.add(p.nombreEspecie);
       }
     }
@@ -133,15 +132,18 @@ class _PacientesViewState extends State<PacientesView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.arrow_back, color: Colors.white, size: 18),
-              SizedBox(width: 6),
-              Text(
-                'Volver',
-                style: TextStyle(color: Colors.white, fontSize: 13),
-              ),
-            ],
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back, color: Colors.white, size: 18),
+                SizedBox(width: 6),
+                Text(
+                  'Volver',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           Row(
@@ -170,16 +172,16 @@ class _PacientesViewState extends State<PacientesView> {
               ),
               Row(
                 children: [
-                  // INICIO - BOTÓN TEMPORAL PARA GESTIÓN DE CITAS (ELIMINAR DESPUÉS)
-                  GestureDetector(
-                  //  onTap: () {
-                    //  Navigator.push(
-                     //   context,
-                      //  MaterialPageRoute(
-                        //  builder: (_) => const GestionCitasView(),
-                      //  ),
-                    //  );
-                    //},
+                   GestureDetector(
+                    onTap: () async {
+                      final uid = await AuthService.obtenerUsuarioId();
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => CitasPage(usuarioId: uid)),
+                        );
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       margin: const EdgeInsets.only(right: 8),
@@ -202,7 +204,6 @@ class _PacientesViewState extends State<PacientesView> {
                       ),
                     ),
                   ),
-                  // FIN - BOTÓN TEMPORAL
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -356,11 +357,7 @@ class _PacientesViewState extends State<PacientesView> {
                         const SizedBox(width: 6),
                         const Text('•'),
                         const SizedBox(width: 6),
-                        const Text('•'),
-                        const SizedBox(width: 6),
                         Text('${p.edad} años'),
-                        const SizedBox(width: 6),
-                        const Text('•'),
                         const SizedBox(width: 6),
                         const Text('•'),
                         const SizedBox(width: 6),
@@ -401,16 +398,16 @@ class _PacientesViewState extends State<PacientesView> {
               Expanded(
                 child: GestureDetector(
                  onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => HistorialMedicoView(
-        nombreMascota: p.nombre,
-        animalId: p.animalId,
-      ),
-    ),
-  );
-},
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HistorialMedicoView(
+                        nombreMascota: p.nombre,
+                        animalId: p.animalId,
+                      ),
+                    ),
+                  );
+                },
                   child: Container(
                     height: 30,
                     decoration: BoxDecoration(

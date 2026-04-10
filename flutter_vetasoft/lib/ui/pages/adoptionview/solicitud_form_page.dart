@@ -1,16 +1,16 @@
 import 'package:jwt_decoder/jwt_decoder.dart';
-import '../../../services/api_service.dart';
 import '../../../services/solicitud_adopcion_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../services/auth_service.dart';
 class SolicitudFormPage extends StatefulWidget {
-  final int animalId;
+  final int animal_id;
   final String animalNombre;
 
   const SolicitudFormPage({
     super.key, 
-    required this.animalId, 
-    required this.animalNombre
+    required this.animal_id, 
+    required this.animalNombre 
   });
 
   @override
@@ -19,9 +19,8 @@ class SolicitudFormPage extends StatefulWidget {
 
 class _SolicitudFormPageState extends State<SolicitudFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final SolicitudAdopcionService _adopcionService = SolicitudAdopcionService();
-
   // Controllers
+
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
@@ -310,7 +309,11 @@ class _SolicitudFormPageState extends State<SolicitudFormPage> {
     setState(() => _isSending = true);
 
     // 1. Extraemos el ID del usuario actual del token
-    final String token = ApiService.currentToken;
+    final String? token = await AuthService.getToken();
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No se pudo obtener el token de usuario. Inicia sesión nuevamente.")));
+      return;
+    }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     final dynamic rawUserId = decodedToken['userId'];
     
@@ -320,23 +323,20 @@ class _SolicitudFormPageState extends State<SolicitudFormPage> {
         : int.tryParse(rawUserId.toString());
 
     // 2. Preparamos el payload con TIPOS DE DATOS EXACTOS para Postgres
-    final payload = {
-      'animal_id': widget.animalId, // Ya es int
-      'nombre_solicitante': _nombreController.text.trim(),
-      'correo_solicitante': _correoController.text.trim(),
-      'telefono_solicitante': _telefonoController.text.trim(),
-      'direccion_solicitante': _direccionController.text.trim(),
-      'experiencia_animales': _experienciaController.text.trim().isEmpty ? "Sin experiencia" : _experienciaController.text.trim(),
-      'motivo': _motivo1Controller.text.trim().isEmpty ? "Interés en adopción" : _motivo1Controller.text.trim(),
-      'estado_id': 1, 
-      'usuario_id': currentUserId,
-    };
-
-    final result = await _adopcionService.createSolicitud(payload);
+   final result = await SolicitudAdopcionService.crearSolicitud(
+  animal_id: widget.animal_id,
+  usuario_id: currentUserId ?? 0, 
+  nombre_solicitante: _nombreController.text.trim(),
+  correo_solicitante: _correoController.text.trim(),
+  telefono_solicitante: _telefonoController.text.trim(),
+  direccion_solicitante: _direccionController.text.trim(),
+  experiencia_animales: _experienciaController.text.trim(),
+  motivo: _motivo1Controller.text.trim(),
+);
     
     setState(() => _isSending = false);
 
-    if (result) {
+    if (result['success'] == true) {
       _showSuccessDialog();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error al enviar la solicitud (500). Verifica los datos.")));

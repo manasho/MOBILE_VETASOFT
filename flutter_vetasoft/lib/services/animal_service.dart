@@ -1,4 +1,5 @@
 import 'api_service.dart';
+import '../models/pacientes_model.dart'; // Importante para getAnimales
 
 class AnimalService {
   final ApiService _api = ApiService();
@@ -52,6 +53,47 @@ class AnimalService {
       return rawList.whereType<Map<String, dynamic>>().toList();
     } catch (e) {
       throw Exception('Error al obtener razas: $e');
+    }
+  }
+
+  /// GET /animales (Lista global para veterinarios)
+  static Future<List<Paciente>> getAnimales() async {
+    try {
+      final response = await ApiService().get('animales');
+      final List data = (response.data is Map) ? (response.data['data'] ?? []) : [];
+      return data.map((json) => Paciente.fromJson(json)).toList();
+    } catch (e) {
+      print('❌ Error en getAnimales: $e');
+      return [];
+    }
+  }
+
+  /// GET /especies
+  static Future<List<Map<String, dynamic>>> getEspecies() async {
+    try {
+      final response = await ApiService().get('especies');
+      final List data = (response.data is Map) ? (response.data['data'] ?? []) : [];
+      return List<Map<String, dynamic>>.from(data);
+    } catch (e) {
+      print('❌ Error en getEspecies: $e');
+      return [];
+    }
+  }
+
+  /// GET /animales/{id}
+  static Future<Map<String, dynamic>?> getAnimalById(String id) async {
+    try {
+      final response = await ApiService().get('animales/$id');
+      if (response.statusCode == 200) {
+        if (response.data is Map && response.data['success'] == true) {
+          return response.data['data'];
+        }
+        return response.data;
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error en getAnimalById: $e');
+      return null;
     }
   }
 }

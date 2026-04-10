@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/solicitudes_adopcion_service.dart';
+import '../../services/solicitud_adopcion_service.dart';
+import '../../services/auth_service.dart';
 
 class AdopcionPage extends StatefulWidget {
   final int animalId;
@@ -111,35 +112,40 @@ class _AdopcionPageState extends State<AdopcionPage> {
 
     setState(() => isLoading = true);
 
-    final response =
-        await SolicitudesAdopcionService.crearSolicitud(
-      animalId: widget.animalId,
-      nombre: nombreCtrl.text,
-      correo: correoCtrl.text,
-      telefono: telefonoCtrl.text,
-      direccion: direccionCtrl.text,
-      experiencia: experienciaCtrl.text,
-      motivo: motivacionCtrl.text,
-    );
+    try {
+      final int? userId = await AuthService.obtenerUsuarioId();
 
-    setState(() => isLoading = false);
+      if (userId == null) {
+        setState(() => isLoading = false);
+        showMessage("Debes iniciar sesión para enviar una solicitud");
+        return;
+      }
 
-    if (response["success"]) {
-      showMessage("Solicitud enviada 🐾");
+      final response = await SolicitudAdopcionService.crearSolicitud(
+        usuario_id: userId,
+        animal_id: widget.animalId,
+        nombre_solicitante: nombreCtrl.text,
+        correo_solicitante: correoCtrl.text,
+        telefono_solicitante: telefonoCtrl.text,
+        direccion_solicitante: direccionCtrl.text,
+        experiencia_animales: experienciaCtrl.text,
+        motivo: motivacionCtrl.text,
+      );
 
-      _formKey.currentState!.reset();
-      nombreCtrl.clear();
-      correoCtrl.clear();
-      telefonoCtrl.clear();
-      direccionCtrl.clear();
-      experienciaCtrl.clear();
-      motivacionCtrl.clear();
-      cuidadoCtrl.clear();
+      setState(() => isLoading = false);
 
-    } else {
-      showMessage(response["message"]);
+      if (response["success"] == true) {
+        showMessage("Solicitud enviada 🐾");
+        Navigator.pop(context);
+      } else {
+        showMessage(response["message"] ?? "Error al enviar solicitud");
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+      showMessage("Error de conexión");
     }
   }
+
 
   void showMessage(String msg) {
     ScaffoldMessenger.of(context)

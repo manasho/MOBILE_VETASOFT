@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/service_auth.dart';
+import '../../services/auth_service.dart';
+import '../../ui/pages/veterianrioview/veterinarian_panel_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,37 +28,34 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => isLoading = true);
 
-    final result = await AuthService.login(
-      correo: email,
-      contrasena: password,
-    );
+    final result = await AuthService.login(correo: email, contrasena: password);
 
     setState(() => isLoading = false);
 
+    
     if (result["success"]) {
       showMessage("Bienvenido 🔥");
-
-      // 👉 Aquí luego navegamos
-      // Navigator.pushReplacement(...)
-
+      // ✅ AQUÍ es donde debe ir la navegación
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => VeterinarianPanelPage()),
+        );
+      }
     } else {
       showMessage(result["message"]);
     }
   }
 
   void showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF2F2C3A),
-        ),
+        decoration: const BoxDecoration(color: Color(0xFF2F2C3A)),
         child: Center(
           child: SingleChildScrollView(
             child: Container(
@@ -74,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
                     backgroundColor: Colors.purple,
                     child: CircleAvatar(
                       radius: 35,
-                      backgroundImage: AssetImage(''),
                     ),
                   ),
 
@@ -82,10 +79,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const Text(
                     'Vetasoft',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
 
                   const Text(
@@ -170,10 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
                       gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF5A8DEE),
-                          Color(0xFF8E5AEF),
-                        ],
+                        colors: [Color(0xFF5A8DEE), Color(0xFF8E5AEF)],
                       ),
                     ),
                     child: ElevatedButton(
@@ -187,9 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : const Text("Iniciar sesión"),
                     ),
                   ),

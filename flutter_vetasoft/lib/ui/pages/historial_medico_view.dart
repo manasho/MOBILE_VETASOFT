@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/service_historial_medico.dart';
+import '../../services/historial_medico_service.dart';
 import '../../models/historial_medico_model.dart';
 import 'ver_registro_view.dart';  
 import 'agregar_registro_view.dart';
@@ -115,7 +115,7 @@ class _HistorialMedicoViewState extends State<HistorialMedicoView> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Historial medico',
+            'Historial médico',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,

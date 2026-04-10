@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/animales_service.dart';
+import '../../services/animal_service.dart';
 
 class AgendaPage extends StatefulWidget {
   final String animalId;
@@ -29,8 +29,7 @@ class _AgendaPageState extends State<AgendaPage> {
   }
 
   Future<void> loadData() async {
-    final data = await AnimalesService.getAnimalById(
-        widget.animalId, widget.token);
+    final data = await AnimalService.getAnimalById(widget.animalId);
 
     if (data != null) {
       final historial = data["historial_medico"] ?? [];

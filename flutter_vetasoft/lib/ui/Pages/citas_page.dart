@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import '../../services/service_citas.dart';
+import '../../services/citas_service.dart';
 
-class AgendaPage extends StatefulWidget {
-  final String token;
-  final int clienteId;
+class CitasPage extends StatefulWidget {
+  final int? clienteId;
+  final int? usuarioId;
 
-  const AgendaPage({
+  const CitasPage({
     super.key,
-    required this.token,
-    required this.clienteId,
+    this.clienteId,
+    this.usuarioId,
   });
 
   @override
-  State<AgendaPage> createState() => _AgendaPageState();
+  State<CitasPage> createState() => _CitasPageState();
 }
 
-class _AgendaPageState extends State<AgendaPage> {
+class _CitasPageState extends State<CitasPage> {
+  final CitasService _citasService = CitasService();
   List citas = [];
   bool isLoading = true;
 
@@ -29,14 +30,14 @@ class _AgendaPageState extends State<AgendaPage> {
   }
 
   Future<void> loadCitas() async {
-    final data = await ApiServiceCitas.getCitas(
+    final data = await _citasService.getCitas(
       clienteId: widget.clienteId,
+      usuarioId: widget.usuarioId,
     );
 
-    pendientes = data.where((c) => c["estado_nombre"] == "Pendiente").length;
-    completadas = data.where((c) => c["estado_nombre"] == "Completada").length;
-
     setState(() {
+      pendientes = data.where((c) => c["estado_nombre"] == "Pendiente").length;
+      completadas = data.where((c) => c["estado_nombre"] == "Completada" || c["estado_nombre"] == "Finalizada").length;
       citas = data;
       isLoading = false;
     });
@@ -49,6 +50,11 @@ class _AgendaPageState extends State<AgendaPage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
+    final String titulo = widget.usuarioId != null ? "Agenda Veterinaria" : "Tu Agenda";
+    final String subtitulo = widget.usuarioId != null 
+        ? "Citas asignadas a ti" 
+        : "Mascota: ${citas.isNotEmpty ? (citas[0]["animal_nombre"] ?? "N/A") : ""}";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
@@ -80,19 +86,32 @@ class _AgendaPageState extends State<AgendaPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  const Row(
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.arrow_back, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text("Volver", style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("¡Hola, Juan!",
-                          style: TextStyle(color: Colors.white, fontSize: 28)),
-                      Icon(Icons.notifications_none, color: Colors.white)
+                      Text(titulo,
+                          style: const TextStyle(color: Colors.white, fontSize: 28)),
+                      const Icon(Icons.notifications_none, color: Colors.white)
                     ],
                   ),
 
                   const SizedBox(height: 10),
 
                   Text(
-                    "Mascota: ${citas.isNotEmpty ? citas[0]["animal_nombre"] : ""}",
+                    subtitulo,
                     style: const TextStyle(color: Colors.white70),
                   ),
 
@@ -100,16 +119,17 @@ class _AgendaPageState extends State<AgendaPage> {
 
                   Row(
                     children: [
-                      _infoCard("Citas Pendientes", pendientes.toString()),
+                      _infoCard("Pendientes", pendientes.toString()),
                       const SizedBox(width: 10),
-                      _infoCard("Citas completadas", completadas.toString()),
+                      _infoCard("Completadas", completadas.toString()),
                     ],
                   ),
                 ],
               ),
             ),
 
-            /// BOTÓN
+            /// BOTÓN (Solo mostrar si es cliente o si el vet quiere agendar)
+            if (widget.usuarioId == null)
             Padding(
               padding: const EdgeInsets.all(20),
               child: Container(
@@ -134,6 +154,7 @@ class _AgendaPageState extends State<AgendaPage> {
             ),
 
             /// ALERTA
+            if (pendientes > 0)
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(15),
@@ -147,7 +168,7 @@ class _AgendaPageState extends State<AgendaPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      "Tienes $pendientes cita(s) pendiente(s)\nNo olvides confirmar tus próximas citas",
+                      "Tienes $pendientes cita(s) pendiente(s)",
                       style: const TextStyle(color: Colors.orange),
                     ),
                   )
@@ -162,7 +183,7 @@ class _AgendaPageState extends State<AgendaPage> {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Historial de citas",
+                child: Text("Listado de citas",
                     style:
                         TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               ),
@@ -170,7 +191,13 @@ class _AgendaPageState extends State<AgendaPage> {
 
             const SizedBox(height: 10),
 
-            ...citas.map((c) => _citaCard(c)).toList(),
+            if (citas.isEmpty)
+              const Center(child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Text("No hay citas registradas"),
+              ))
+            else
+              ...citas.map((c) => _citaCard(c)).toList(),
 
             const SizedBox(height: 30),
           ],
@@ -206,7 +233,7 @@ class _AgendaPageState extends State<AgendaPage> {
     final estado = c["estado_nombre"] ?? "";
 
     Color colorEstado =
-        estado == "Completada" ? Colors.green : Colors.orange;
+        (estado == "Completada" || estado == "Finalizada") ? Colors.green : Colors.orange;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -236,7 +263,9 @@ class _AgendaPageState extends State<AgendaPage> {
           ),
 
           const SizedBox(height: 5),
-          Text(c["veterinario_nombre"] ?? ""),
+          Text(widget.usuarioId != null 
+              ? "Dueño: ${c["cliente_nombre"] ?? "N/A"}"
+              : "Veterinario: ${c["veterinario_nombre"] ?? "Veterinario"}"),
 
           const SizedBox(height: 10),
 
@@ -244,15 +273,15 @@ class _AgendaPageState extends State<AgendaPage> {
             children: [
               const Icon(Icons.access_time, size: 16),
               const SizedBox(width: 5),
-              Text(c["fecha_cita"].toString()),
+              Text(c["fecha_cita"]?.toString() ?? ""),
             ],
           ),
 
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.location_on, size: 16),
-              const SizedBox(width: 5),
-              const Text("Clínica Veterinaria"),
+              Icon(Icons.location_on, size: 16),
+              SizedBox(width: 5),
+              Text("Clínica Veterinaria"),
             ],
           ),
 
