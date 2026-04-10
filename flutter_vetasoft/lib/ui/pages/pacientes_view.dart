@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vetasoft/models/pacientes_model.dart';
 import 'package:flutter_vetasoft/services/animal_service.dart';
+import 'animalview/add_animal_view.dart';
+import 'perfil_mascota_page.dart';
 import 'historial_medico_view.dart'; // Importa la vista de historial
 import 'citas_page.dart';
 import '../../services/auth_service.dart';
@@ -204,18 +206,24 @@ class _PacientesViewState extends State<PacientesView> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AddAnimalView()),
                     ),
-                    child: const Text(
-                      '+ Registrar',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color.fromARGB(255, 5, 5, 5),
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        '+ Registrar',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color.fromARGB(255, 5, 5, 5),
+                        ),
                       ),
                     ),
                   ),
@@ -375,22 +383,38 @@ class _PacientesViewState extends State<PacientesView> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 30,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF5D9CC5),
-                        Color(0xFF664492),
-                      ],
+                child: GestureDetector(
+                  onTap: () async {
+                    final token = await AuthService.getToken();
+                    if (context.mounted && token != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PerfilMascotaPage(
+                            animalId: p.animalId.toString(),
+                            token: token,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF5D9CC5),
+                          Color(0xFF664492),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Center(
-                    child: Text('Editar',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
+                    child: const Center(
+                      child: Text('Editar',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ),
               ),

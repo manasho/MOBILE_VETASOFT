@@ -7,14 +7,26 @@ import '../../../widgets/action_card.dart';
 import '../../../widgets/appointment_tile.dart'; // ✅ Importamos el nuevo componente
 import '../pacientes_view.dart';
 import '../citas_page.dart';
-import '../donationsview/donations_view.dart';
 import '../adoptionview/solicitudes_list_page.dart';
 import '../login_page.dart';
 import '../../../services/auth_service.dart';
-class VeterinarianPanelPage extends StatelessWidget {
-  VeterinarianPanelPage({super.key});
-  
+import '../donaciones_pages.dart';
+class VeterinarianPanelPage extends StatefulWidget {
+  const VeterinarianPanelPage({super.key});
+
+  @override
+  State<VeterinarianPanelPage> createState() => _VeterinarianPanelPageState();
+}
+
+class _VeterinarianPanelPageState extends State<VeterinarianPanelPage> {
   final VetService _vetService = VetService();
+  late Future<VetDashboardStats> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statsFuture = _vetService.getDashboardStats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +38,7 @@ class VeterinarianPanelPage extends StatelessWidget {
             _buildHeader(context),
             
             FutureBuilder<VetDashboardStats>(
-              future: _vetService.getDashboardStats(),
+              future: _statsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
@@ -118,7 +130,7 @@ class VeterinarianPanelPage extends StatelessWidget {
           ),GestureDetector(
             onTap: () async {
               await AuthService.logout();
-              if (context.mounted) {
+              if (mounted) {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
               }
             },
@@ -192,7 +204,7 @@ class VeterinarianPanelPage extends StatelessWidget {
           title: "Gestión de citas",
           onTap: () async {
             final uid = await AuthService.obtenerUsuarioId();
-            if (context.mounted) {
+            if (mounted) {
               Navigator.push(context, MaterialPageRoute(builder: (_) => CitasPage(usuarioId: uid)));
             }
           },
@@ -205,7 +217,15 @@ class VeterinarianPanelPage extends StatelessWidget {
         ActionCard(
           icon: Icons.favorite, 
           title: "Donaciones",
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DonationsView())),
+          onTap: () async {
+            final token = await AuthService.getToken();
+            if (mounted && token != null) {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (_) => DonacionesPage(token: token))
+              );
+            }
+          },
         ),
         ActionCard(
           icon: Icons.home, 

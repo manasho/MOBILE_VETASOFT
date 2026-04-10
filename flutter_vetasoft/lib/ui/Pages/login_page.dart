@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
-import '../../ui/pages/veterianrioview/veterinarian_panel_page.dart';
+import '../../ui/pages/veterinarioview/veterinarian_panel_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -149,10 +149,10 @@ class _LoginPageState extends State<LoginPage> {
                           const Text("Recordarme"),
                         ],
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("¿Olvidaste tu contraseña?"),
-                      ),
+                      //TextButton(
+                      //onPressed: () {},
+                      //child: const Text("¿Olvidaste tu contraseña?"),
+                      //),
                     ],
                   ),
 

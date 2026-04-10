@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../services/animal_service.dart';
 
-class AgendaPage extends StatefulWidget {
+class PerfilMascotaPage extends StatefulWidget {
   final String animalId;
   final String token;
 
-  const AgendaPage({
+  const PerfilMascotaPage({
     super.key,
     required this.animalId,
     required this.token,
   });
 
   @override
-  State<AgendaPage> createState() => _AgendaPageState();
+  State<PerfilMascotaPage> createState() => _PerfilMascotaPageState();
 }
 
-class _AgendaPageState extends State<AgendaPage> {
+class _PerfilMascotaPageState extends State<PerfilMascotaPage> {
   Map<String, dynamic>? animal;
   bool isLoading = true;
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Imports de la rama Pruebas y Tifanny
 import 'package:flutter_vetasoft/ui/pages/adoptionview/solicitudes_list_page.dart';
 import 'package:flutter_vetasoft/ui/pages/profileview/Profile_cofig_page.dart';
-import 'package:flutter_vetasoft/ui/pages/veterianrioview/veterinarian_panel_page.dart';
+import 'package:flutter_vetasoft/ui/pages/veterinarioview/veterinarian_panel_page.dart';
 import 'package:flutter_vetasoft/ui/pages/adoptionview/solicitud_form_page.dart';
 import 'package:flutter_vetasoft/ui/pages/pettview/register_client_view.dart';
 import 'package:flutter_vetasoft/ui/pages/pacientes_view.dart';
