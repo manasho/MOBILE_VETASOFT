@@ -23,9 +23,20 @@ class AuthService {
 
       if (response.statusCode == 200 && data["success"]) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", data["data"]["token"]);
+        final token = data["data"]["token"] as String;
+        await prefs.setString("token", token);
 
-        return {"success": true, "user": data["data"]["user"]};
+        // El rol y cliente_id vienen en el objeto user, NO en el JWT
+        final userObj = data["data"]["user"];
+        final rolId = userObj?['rol_id'] ?? 0;          // 3 = cliente
+        final clienteId = userObj?['cliente_id'];       // null si es veterinario
+
+        await prefs.setString("rol", rolId.toString());
+        if (clienteId != null) {
+          await prefs.setInt("cliente_id", int.tryParse(clienteId.toString()) ?? 0);
+        }
+
+        return {"success": true, "user": userObj, "rol": rolId};
       }
 
       return {"success": false, "message": data["message"] ?? "Error en login"};
@@ -80,6 +91,31 @@ class AuthService {
     } catch (e) {
       return {"success": false, "message": "Error de conexión: $e"};
     }
+  }
+
+  /**
+   * OBTENER ROL DEL USUARIO (desde SharedPreferences o JWT)
+   */
+  static Future<String> obtenerRol() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Primero intenta desde prefs (guardado al login)
+    final rolPrefs = prefs.getString("rol");
+    if (rolPrefs != null && rolPrefs.isNotEmpty) return rolPrefs;
+
+    // Fallback: decodificar el JWT
+    final token = prefs.getString("token");
+    if (token == null || JwtDecoder.isExpired(token)) return 'veterinario';
+    final decoded = JwtDecoder.decode(token);
+    return (decoded['rol'] ?? 'veterinario').toString();
+  }
+
+  /**
+   * OBTENER CLIENTE ID (desde SharedPreferences, guardado en el login)
+   */
+  static Future<int?> obtenerClienteId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getInt("cliente_id");
+    return stored; // null si no es cliente
   }
 
   /**

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../services/animal_service.dart';
+import '../../../services/auth_service.dart';
 import '../donationsview/donations_view.dart';
 import 'edit_profile_view.dart';
 import '../adoptionview/adoption_view.dart';
-import 'pet_profile_view.dart';
+import '../perfil_mascota_page.dart';
+import '../login_page.dart';
 
 class PetsView extends StatefulWidget {
   // Opcional, para simular el cliente. Por ahora forzamos 20 para ver algo
@@ -103,6 +105,21 @@ class _PetsViewState extends State<PetsView> {
                 },
                 icon: const Icon(Icons.settings, color: Colors.white, size: 28),
               ),
+              const SizedBox(width: 8),
+              // Botón cerrar sesión
+              IconButton(
+                tooltip: 'Cerrar sesión',
+                onPressed: () async {
+                  await AuthService.logout();
+                  if (context.mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.exit_to_app_rounded, color: Colors.white, size: 28),
+              ),
             ],
           ),
         ],
@@ -172,8 +189,23 @@ class _PetsViewState extends State<PetsView> {
           ),
         ),
         trailing: const Icon(Icons.chevron_right, color: Colors.blue, size: 28),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => PetProfileView(petData: pet)));
+        onTap: () async {
+          // Obtener el ID del animal — el backend usa 'animal_id' o 'id'
+          final id = pet['animal_id'] ?? pet['id'];
+          if (id == null) return;
+
+          final token = await AuthService.getToken();
+          if (!context.mounted || token == null) return;
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PerfilMascotaPage(
+                animalId: id.toString(),
+                token: token,
+              ),
+            ),
+          );
         },
       ),
     );

@@ -75,4 +75,9 @@ class ApiService {
   Future<Response> patch(String path, {dynamic data}) async {
     return await _dio.patch(_normalize(path), data: data);
   }
+
+  /// Crear una cita (POST /citas)
+  static Future<Response> createCita(Map<String, dynamic> body) async {
+    return await ApiService().post('citas', data: body);
+  }
 }

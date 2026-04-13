@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/animal_service.dart';
+import 'schedule_appointment_view.dart';
 
 class PerfilMascotaPage extends StatefulWidget {
   final String animalId;
@@ -111,26 +112,36 @@ class _PerfilMascotaPageState extends State<PerfilMascotaPage> {
               ),
             ),
 
-            /// BOTÓN
+            /// BOTÓN AGENDAR
             Padding(
               padding: const EdgeInsets.all(20),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF5A8DEE), Color(0xFF8E5AEF)],
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ScheduleAppointmentView(),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF5A8DEE), Color(0xFF8E5AEF)],
+                    ),
                   ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.calendar_month, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text("Agendar nueva cita",
-                        style: TextStyle(color: Colors.white)),
-                  ],
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.calendar_month, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text("Agendar nueva cita",
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                 ),
               ),
             ),

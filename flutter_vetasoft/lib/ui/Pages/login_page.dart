@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../ui/pages/veterinarioview/veterinarian_panel_page.dart';
 import '../../ui/pages/forgot_password_page.dart';
+import '../../ui/pages/pettview/pets_view.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,11 +37,27 @@ class _LoginPageState extends State<LoginPage> {
     
     if (result["success"]) {
       showSuccessSnack("Bienvenido 🔥");
-      // ✅ AQUÍ es donde debe ir la navegación
-      if (mounted) {
+
+      if (!mounted) return;
+
+      // ✅ Navegación por rol  (3 = cliente, cualquier otro = veterinario/admin)
+      final rolVal = int.tryParse(result["rol"].toString()) ?? 0;
+
+      if (rolVal == 3) {
+        // Cliente → ir a su panel de mascotas
+        final clienteId = await AuthService.obtenerClienteId();
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => VeterinarianPanelPage()),
+          MaterialPageRoute(
+            builder: (_) => PetsView(clienteId: clienteId ?? 0),
+          ),
+        );
+      } else {
+        // Veterinario / admin
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => VeterinarianPanelPage()),
         );
       }
     } else {
@@ -170,11 +187,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
               child: Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.purple,
-                    child: CircleAvatar(
-                      radius: 35,
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/login_bg.jpg',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.purple,
+                        child: Icon(Icons.pets, color: Colors.white, size: 36),
+                      ),
                     ),
                   ),
 
@@ -235,46 +258,46 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 10),
 
-                  /// RECORDAR + OLVIDAR
+                  /// RECORDARME
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: rememberMe,
-                            onChanged: (value) {
-                              setState(() {
-                                rememberMe = value!;
-                              });
-                            },
-                          ),
-                          const Text("Recordarme"),
-                        ],
-                      ),
-                      //TextButton(
-                      //onPressed: () {},
-                      //child: const Text("¿Olvidaste tu contraseña?"),
-                      //),
-                      //
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ForgotPasswordPage(),
-                            ),
-                          );
+                      Checkbox(
+                        value: rememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            rememberMe = value!;
+                          });
                         },
-                        child: const Text(
-                          "¿Olvidaste tu contraseña?",
-                          style: TextStyle(
-                            color: Color(0xFF5A8DEE),
-                            fontWeight: FontWeight.w600,
+                      ),
+                      const Text("Recordarme"),
+                    ],
+                  ),
+
+                  /// RECUPERAR CONTRASEÑA (separado, debajo)
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordPage(),
                           ),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                      child: const Text(
+                        "¿Olvidaste tu contraseña?",
+                        style: TextStyle(
+                          color: Color(0xFF5A8DEE),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
                         ),
                       ),
-                    ],
+                    ),
                   ),
 
                   const SizedBox(height: 10),
