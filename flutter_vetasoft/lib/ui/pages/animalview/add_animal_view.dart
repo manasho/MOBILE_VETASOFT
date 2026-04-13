@@ -180,18 +180,18 @@ Future<void> _seleccionarImagen(ImageSource source) async {
       }
 
       final animal = AnimalModel(
-        clienteId: 28,
+        cliente_id: null  ,
         nombre: _nombreCtrl.text.trim(),
-        razaId: _razaIdSeleccionada!,
+        raza_id: _razaIdSeleccionada!,
         edad: _edadCtrl.text.isNotEmpty ? int.tryParse(_edadCtrl.text) : null,
         peso: _pesoCtrl.text.isNotEmpty
             ? double.tryParse(_pesoCtrl.text.replaceAll(',', '.'))
             : null,
         sexo: _sexoSeleccionado,
-        fechaNacimiento: _fechaNacimCtrl.text.isNotEmpty ? _fechaNacimCtrl.text.trim() : null,
+        fecha_nacimiento: _fechaNacimCtrl.text.isNotEmpty ? _fechaNacimCtrl.text.trim() : null,
         descripcion: _observacionesCtrl.text.trim().isNotEmpty ? _observacionesCtrl.text.trim() : 'Sin observaciones',
-        numeroChip: _chipCtrl.text.trim().isNotEmpty ? _chipCtrl.text.trim() : null,
-        estado: _estadoSeleccionado,
+        numero_chip: _chipCtrl.text.trim().isNotEmpty ? _chipCtrl.text.trim() : null,
+        estado_animal: _estadoSeleccionado,
         foto: fotoBase64,  // <-- ahora envía el base64 o null
       );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../ui/pages/veterinarioview/veterinarian_panel_page.dart';
+import '../../ui/pages/forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
     // 🔎 Validaciones
     if (email.isEmpty || password.isEmpty) {
-      showMessage("Completa todos los campos");
+      showErrorDialog("Por favor, completa el correo y la contraseña.");
       return;
     }
 
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
 
     
     if (result["success"]) {
-      showMessage("Bienvenido 🔥");
+      showSuccessSnack("Bienvenido 🔥");
       // ✅ AQUÍ es donde debe ir la navegación
       if (mounted) {
         Navigator.pushReplacement(
@@ -43,12 +44,114 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } else {
-      showMessage(result["message"]);
+      showErrorDialog(result["message"] ?? "Credenciales inválidas");
     }
   }
 
-  void showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  /// Alerta de error prominente (credenciales inválidas, conexión, etc.)
+  void showErrorDialog(String msg) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFF2F2C3A),
+        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Ícono de error
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD94040).withAlpha(30),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock_outline_rounded,
+                color: Color(0xFFD94040),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Título
+            const Text(
+              'Credenciales inválidas',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Mensaje del backend
+            Text(
+              msg,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white60,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Botón Aceptar
+            SizedBox(
+              width: double.infinity,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFD94040), Color(0xFFB02020)],
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Intentar de nuevo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// SnackBar de éxito (login correcto)
+  void showSuccessSnack(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Text(msg, style: const TextStyle(color: Colors.white)),
+          ],
+        ),
+        backgroundColor: const Color(0xFF5A8DEE),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   @override
@@ -153,6 +256,24 @@ class _LoginPageState extends State<LoginPage> {
                       //onPressed: () {},
                       //child: const Text("¿Olvidaste tu contraseña?"),
                       //),
+                      //
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ForgotPasswordPage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "¿Olvidaste tu contraseña?",
+                          style: TextStyle(
+                            color: Color(0xFF5A8DEE),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
 

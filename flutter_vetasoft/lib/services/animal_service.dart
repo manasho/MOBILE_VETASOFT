@@ -7,7 +7,7 @@ class AnimalService {
   /// POST /animales
   Future<Map<String, dynamic>> createAnimal(Map<String, dynamic> body) async {
     try {
-      final response = await _api.post('/animales', data: body);
+      final response = await _api.post('animales', data: body);
       return response.data;
     } catch (e) {
       throw Exception('Error al crear animal: $e');
@@ -17,7 +17,7 @@ class AnimalService {
   /// GET /animales?cliente_id={id}
   Future<List<Map<String, dynamic>>> getAnimalesByCliente(int clienteId) async {
     try {
-      final response = await _api.get('/animales', queryParameters: {'cliente_id': clienteId});
+      final response = await _api.get('/animales', queryParameters: {'cliente_id': clienteId });
       final decoded = response.data;
 
       List<dynamic> rawList;

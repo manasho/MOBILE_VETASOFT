@@ -101,24 +101,24 @@ class _RegisterPetViewState extends State<RegisterPetView> {
 
       // 2️⃣ Crear animal con el cliente_id obtenido
       final animal = AnimalModel(
-        clienteId: clienteId,
+        cliente_id: clienteId,
         nombre: _nombreCtrl.text.trim(),
-        razaId: _razaIdSeleccionada!,
+        raza_id: _razaIdSeleccionada!,
         // Aseguramos que edad y peso no sean nulos para cumplir con el esquema (NOT NULL)
         edad: int.tryParse(_edadCtrl.text) ?? 0,
         peso: double.tryParse(_pesoCtrl.text.replaceAll(',', '.')) ?? 0.1,
         sexo: _sexoSeleccionado,
-        fechaNacimiento: _fechaNacimCtrl.text.isNotEmpty
+        fecha_nacimiento: _fechaNacimCtrl.text.isNotEmpty
             ? _fechaNacimCtrl.text.trim()
             : null,
-        numeroChip: _chipCtrl.text.trim().isNotEmpty
+        numero_chip: _chipCtrl.text.trim().isNotEmpty
             ? _chipCtrl.text.trim()
             : null,
         // Descripción marcada como NOT NULL en DB -> enviamos valor por defecto si está vacía
         descripcion: _observacionesCtrl.text.trim().isNotEmpty 
             ? _observacionesCtrl.text.trim() 
             : 'Sin observaciones',
-        estado: 'Con dueño', // ✅ Corregido con C mayúscula según esquema
+        estado_animal: 'Con dueño', // ✅ Corregido con C mayúscula según esquema
       );
 
       await _animalService.createAnimal(animal.toJson());

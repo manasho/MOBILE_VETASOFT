@@ -35,6 +35,54 @@ class AuthService {
   }
 
   /**
+   * SOLICITAR RECUPERACIÓN DE CONTRASEÑA (envía código OTP al correo)
+   */
+  static Future<Map<String, dynamic>> solicitarRecuperacion({
+    required String correo,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        "/auth/forgot-password",
+        data: {"correo": correo},
+      );
+      final data = response.data;
+      if (response.statusCode == 200) {
+        return {"success": true, "message": data["message"] ?? "Código enviado"};
+      }
+      return {"success": false, "message": data["message"] ?? "Error al enviar código"};
+    } catch (e) {
+      return {"success": false, "message": "Error de conexión: $e"};
+    }
+  }
+
+  /**
+   * RESETEAR CONTRASEÑA  (valida código OTP y guarda nueva contraseña)
+   */
+  static Future<Map<String, dynamic>> resetearContrasena({
+    required String correo,
+    required String codigo,
+    required String nuevaContrasena,
+  }) async {
+    try {
+      final response = await ApiService().post(
+        "/auth/reset-password",
+        data: {
+          "correo": correo,
+          "codigo": codigo,
+          "nuevaContrasena": nuevaContrasena,
+        },
+      );
+      final data = response.data;
+      if (response.statusCode == 200) {
+        return {"success": true, "message": data["message"] ?? "Contraseña actualizada"};
+      }
+      return {"success": false, "message": data["message"] ?? "Error al restablecer"};
+    } catch (e) {
+      return {"success": false, "message": "Error de conexión: $e"};
+    }
+  }
+
+  /**
    * OBTENER ID USUARIO 🔥
    */
   static Future<int?> obtenerUsuarioId() async {

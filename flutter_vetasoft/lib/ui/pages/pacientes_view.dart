@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vetasoft/models/pacientes_model.dart';
 import 'package:flutter_vetasoft/services/animal_service.dart';
 import 'animalview/add_animal_view.dart';
-import 'perfil_mascota_page.dart';
+
 import 'historial_medico_view.dart'; // Importa la vista de historial
 import 'citas_page.dart';
 import '../../services/auth_service.dart';
@@ -384,20 +384,20 @@ class _PacientesViewState extends State<PacientesView> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () async {
-                    final token = await AuthService.getToken();
-                    if (context.mounted && token != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PerfilMascotaPage(
-                            animalId: p.animalId.toString(),
-                            token: token,
-                          ),
-                        ),
-                      );
-                    }
-                  },
+                  //onTap: () async {
+                   // final token = await AuthService.getToken();
+                   // if (context.mounted && token != null) {
+                     // Navigator.push(
+                      //  context,
+                      //  MaterialPageRoute(
+                          //builder: (_) => PerfilMascotaPage(
+                           // animalId: p.animalId.toString(),
+                           // token: token,
+                          //),
+                       // ),
+                     // );
+                    //}
+                  //},
                   child: Container(
                     height: 30,
                     decoration: BoxDecoration(
