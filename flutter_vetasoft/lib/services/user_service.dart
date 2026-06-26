@@ -1,7 +1,7 @@
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'api_service.dart';
 import '../models/app_user.dart';
-
+import '../services/auth_service.dart';
 class UserService {
   final ApiService _api = ApiService();
 
@@ -9,10 +9,10 @@ class UserService {
   Future<AppUser> getCurrentUser() async {
     try {
       // 1. Tomamos el token CENTRALIZADO del ApiService
-      final String token = ApiService.currentToken;
+      final String? token = await AuthService.getToken();
       
       // 2. Decodificamos el token solo para obtener el ID
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
       final int userId = decodedToken['userId'] ?? 0;
 
       // 3. Pedimos los datos completos (teléfono, dirección) a la API
