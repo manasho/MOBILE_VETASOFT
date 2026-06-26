@@ -27,15 +27,27 @@ class _SolicitudesListPageState extends State<SolicitudesListPage> {
     _loadData();
   }
 
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    final data = await _adopcionService.getAllSolicitudes();
-    setState(() {
-      _allSolicitudes = data;
-      _filteredSolicitudes = data;
-      _isLoading = false;
-    });
-  }
+ Future<void> _loadData() async {
+  setState(() => _isLoading = true);
+  // 1. Obtenemos el mapa de respuesta
+  final response = await SolicitudAdopcionService.getSolicitudes();
+  setState(() {
+    if (response['success'] == true) {
+      // 2. Extraemos la lista raw (la que viene del JSON)
+      final List<dynamic> rawList = response['data'] ?? [];
+      // 3. Convertimos esa lista de Mapas en una lista de objetos SolicitudAdopcion
+      final List<SolicitudAdopcion> list = rawList
+          .map((json) => SolicitudAdopcion.fromJson(json))
+          .toList();
+      _allSolicitudes = list;
+      _filteredSolicitudes = list;
+    } else {
+      // Opcional: Manejar el error si success es false
+      print("Error al cargar: ${response['message']}");
+    }
+    _isLoading = false;
+  });
+}
 
   void _filterSolicitudes(String query) {
     setState(() {
@@ -95,20 +107,23 @@ class _SolicitudesListPageState extends State<SolicitudesListPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-                  const SizedBox(width: 5),
-                  Text("Volver", style: GoogleFonts.outfit(color: Colors.white, fontSize: 16)),
-                ],
-              ),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Row(
+              children: [
+                const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                const SizedBox(width: 5),
+                Text("Volver", style: GoogleFonts.outfit(color: Colors.white, fontSize: 16)),
+              ],
+            ),
+          ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SolicitudFormPage(
-                        animalId: 1, 
+                        animal_id: 1, 
                         animalNombre: 'Kuro',
                       ),
                     ),

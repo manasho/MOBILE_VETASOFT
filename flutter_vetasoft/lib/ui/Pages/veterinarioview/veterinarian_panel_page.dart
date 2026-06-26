@@ -5,11 +5,28 @@ import '../../../services/vet_service.dart';
 import '../../../widgets/stat_card.dart';
 import '../../../widgets/action_card.dart';
 import '../../../widgets/appointment_tile.dart'; // ✅ Importamos el nuevo componente
+import '../pacientes_view.dart';
+import '../citas_page.dart';
+import '../adoptionview/solicitudes_list_page.dart';
+import '../login_page.dart';
+import '../../../services/auth_service.dart';
+import '../donaciones_pages.dart';
+class VeterinarianPanelPage extends StatefulWidget {
+  const VeterinarianPanelPage({super.key});
 
-class VeterinarianPanelPage extends StatelessWidget {
-  VeterinarianPanelPage({super.key});
-  
+  @override
+  State<VeterinarianPanelPage> createState() => _VeterinarianPanelPageState();
+}
+
+class _VeterinarianPanelPageState extends State<VeterinarianPanelPage> {
   final VetService _vetService = VetService();
+  late Future<VetDashboardStats> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statsFuture = _vetService.getDashboardStats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +38,7 @@ class VeterinarianPanelPage extends StatelessWidget {
             _buildHeader(context),
             
             FutureBuilder<VetDashboardStats>(
-              future: _vetService.getDashboardStats(),
+              future: _statsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
@@ -47,7 +64,7 @@ class VeterinarianPanelPage extends StatelessWidget {
                       const SizedBox(height: 25),
                       _buildStatsGrid(stats),
                       const SizedBox(height: 35),
-                      _buildActionCardsSection(),
+                      _buildActionCardsSection(context),
                       const SizedBox(height: 35),
                       
                       // 🕒 5. SECCIÓN DE PRÓXIMAS CITAS REALES
@@ -110,14 +127,22 @@ class VeterinarianPanelPage extends StatelessWidget {
               Text("Clínica veterinaria Branquiovet",
                 style: GoogleFonts.outfit(fontSize: 16, color: Colors.white70)),
             ],
+          ),GestureDetector(
+            onTap: () async {
+              await AuthService.logout();
+              if (mounted) {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+              }
+            },
+            child: const Column(
+              children: [
+                Text("Salir", style: TextStyle(color: Colors.white70)),
+                Icon(Icons.exit_to_app, color: Colors.white, size: 30),
+              ],
+            ),
           ),
-          const Column(
-            children: [
-              Text("Salir", style: TextStyle(color: Colors.white70)),
-              Icon(Icons.exit_to_app, color: Colors.white, size: 30),
-            ],
-          ),
-        ],
+          
+        ]
       ),
     );
   }
@@ -165,7 +190,7 @@ class VeterinarianPanelPage extends StatelessWidget {
   }
 
   // --- 4. SECCIÓN DE ACCIONES ---
-  Widget _buildActionCardsSection() {
+  Widget _buildActionCardsSection(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -173,11 +198,40 @@ class VeterinarianPanelPage extends StatelessWidget {
       crossAxisSpacing: 15,
       mainAxisSpacing: 15,
       childAspectRatio: 1.1,
-      children: const [
-        ActionCard(icon: Icons.calendar_today, title: "Gestión de citas"),
-        ActionCard(icon: Icons.pets, title: "Pacientes"),
-        ActionCard(icon: Icons.favorite, title: "Donaciones"),
-        ActionCard(icon: Icons.home, title: "Adopciones"),
+      children: [
+        ActionCard(
+          icon: Icons.calendar_today, 
+          title: "Gestión de citas",
+          onTap: () async {
+            final uid = await AuthService.obtenerUsuarioId();
+            if (mounted) {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => CitasPage(usuarioId: uid)));
+            }
+          },
+        ),
+        ActionCard(
+          icon: Icons.pets, 
+          title: "Pacientes",
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PacientesView())),
+        ),
+        ActionCard(
+          icon: Icons.favorite, 
+          title: "Donaciones",
+          onTap: () async {
+            final token = await AuthService.getToken();
+            if (mounted && token != null) {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (_) => DonacionesPage(token: token))
+              );
+            }
+          },
+        ),
+        ActionCard(
+          icon: Icons.home, 
+          title: "Adopciones",
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SolicitudesListPage())),
+        ),
       ],
     );
   }
